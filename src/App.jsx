@@ -257,6 +257,7 @@ function App() {
     if (!activeEmotion) return
     setCompanionCount(0)
     pickCard(activeEmotion)
+    window.scrollTo(0, 0)
   }
 
   function showFarewell() {
