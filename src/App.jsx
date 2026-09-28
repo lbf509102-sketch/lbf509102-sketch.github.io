@@ -253,6 +253,12 @@ function App() {
     setCompanionCount((count) => count + 1)
   }
 
+  function showNextCard() {
+    if (!activeEmotion) return
+    setCompanionCount(0)
+    pickCard(activeEmotion)
+  }
+
   function showFarewell() {
     const messages = ['门没锁，随时可以回来', '今天到这里也可以', '不用带走什么', '下次想来，再来', '这里一直在']
     setFarewell(messages[Math.floor(Math.random() * messages.length)])
@@ -306,6 +312,7 @@ function App() {
             isFavorite={isFavorite}
             onFavorite={toggleFavorite}
             onStay={showNextCompanion}
+            onNext={showNextCard}
             onBack={leaveCard}
           />
         )}
@@ -343,7 +350,7 @@ function Home({ onChoose, farewell }) {
   )
 }
 
-function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onBack }) {
+function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onNext, onBack }) {
   return (
     <section className="card-view view-enter">
       <button className="back-button" onClick={onBack}><Icon name="back" />换一种状态</button>
@@ -360,11 +367,12 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
           <Icon name="heart" filled={isFavorite} />
         </button>
       </article>
-      {companionCount < companions.length && <div className="card-actions">
-        <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>
-      </div>}
+      <div className="card-actions">
+        {companionCount < companions.length && <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>}
+        <button className="text-button" onClick={onNext} aria-label="看下一张卡片">下一张卡片</button>
+      </div>
       <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>
-        {companionCount === companions.length ? '可以停在这里' : '你可以停在这里，也可以就这样离开'}
+        可以停在这里，也可以看下一张卡片
       </p>
     </section>
   )

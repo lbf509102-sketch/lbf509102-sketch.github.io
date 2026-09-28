@@ -257,7 +257,7 @@ h1 {
 
 .save-button:hover, .save-button.saved { color: var(--rose); border-color: var(--rose); }
 .save-button svg { width: 22px; height: 22px; }
-.card-actions { display: flex; justify-content: center; margin-top: 26px; }
+.card-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
 
 .text-button, .danger-button {
   min-height: 44px;
