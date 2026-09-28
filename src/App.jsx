@@ -304,8 +304,8 @@ function App() {
           <button className="icon-button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'} aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}>
             <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
           </button>
-          <button className="icon-button favorite-nav" onClick={() => setView('favorites')} title="收藏" aria-label="查看收藏">
-            <Icon name="heart" />
+          <button className={`icon-button favorite-nav ${favorites.length ? 'has-favorites' : ''}`} onClick={() => setView('favorites')} title="收藏" aria-label="查看收藏">
+            <Icon name="heart" filled={favorites.length > 0} />
           </button>
           <button className="icon-button" onClick={() => setView('about')} title="关于与安全支持" aria-label="打开关于与安全支持">
             <Icon name="info" />

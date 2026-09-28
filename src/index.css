@@ -106,6 +106,7 @@ nav { display: flex; gap: 4px; }
 }
 
 .icon-button:hover { background: var(--surface); color: var(--text); }
+.favorite-nav.has-favorites { color: var(--rose); }
 
 .icon-button svg, .row-arrow svg, .back-button svg, .text-button svg, .danger-button svg {
   width: 20px;
