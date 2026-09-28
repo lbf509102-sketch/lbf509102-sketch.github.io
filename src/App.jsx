@@ -191,15 +191,25 @@ function App() {
   }, [favorites])
 
   useEffect(() => {
-    const onPopState = () => setViewState(readView())
+    const onPopState = () => {
+      const nextView = readView()
+      if (view === 'card' && nextView === 'home') showFarewell()
+      setViewState(nextView)
+    }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
-  }, [])
+  }, [view])
 
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && view !== 'home') {
         setConfirmClear(false)
+        if (view === 'card') {
+          showFarewell()
+          window.history.replaceState({ view: 'home' }, '', window.location.pathname)
+          setViewState('home')
+          return
+        }
         window.history.replaceState({ view: 'home' }, '', window.location.pathname)
         setViewState('home')
       }
