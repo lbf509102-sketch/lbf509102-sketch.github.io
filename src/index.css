@@ -172,6 +172,7 @@ h1 {
 .emotion-copy small { color: var(--muted); font-size: 13px; }
 .row-arrow { color: var(--muted); display: grid; place-items: center; }
 .quiet-note, .leave-note { margin: 28px 0 0; color: var(--muted); text-align: center; font-size: 13px; }
+.leave-note.settled { opacity: .72; }
 
 .back-button {
   display: inline-flex;
@@ -235,6 +236,10 @@ h1 {
   line-height: 1.65;
   animation: companion-in .8s ease both;
 }
+
+.companion-line:nth-child(2) { font-size: 15px; opacity: .86; }
+.companion-line:nth-child(3) { font-size: 14px; opacity: .72; }
+.companion-line:nth-child(4) { font-size: 13px; opacity: .58; }
 
 .save-button {
   align-self: flex-end;

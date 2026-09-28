@@ -331,7 +331,7 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
         </div>
         <p aria-live="polite">{card.text}</p>
         <div className="companion-lines" aria-live="polite">
-          {companions.slice(0, companionCount).map((line) => <p className="companion-line" key={line}>{line}</p>)}
+          {companions.slice(0, companionCount).map((line, index) => <p className="companion-line" key={`${emotion.id}-companion-${index}`}>{line}</p>)}
         </div>
         <button className={`save-button ${isFavorite ? 'saved' : ''}`} onClick={onFavorite} title={isFavorite ? '取消收藏' : '收藏这句话'} aria-label={isFavorite ? '取消收藏这句话' : '收藏这句话'} aria-pressed={isFavorite}>
           <Icon name="heart" filled={isFavorite} />
@@ -340,7 +340,9 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
       {companionCount < companions.length && <div className="card-actions">
         <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>
       </div>}
-      <p className="leave-note">你可以停在这里，也可以直接离开。</p>
+      <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>
+        {companionCount === companions.length ? '可以停在这里。' : '你可以停在这里，也可以直接离开。'}
+      </p>
     </section>
   )
 }
