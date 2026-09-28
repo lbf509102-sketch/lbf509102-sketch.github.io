@@ -260,6 +260,17 @@ function App() {
     window.scrollTo(0, 0)
   }
 
+  function openFavorite(item) {
+    const emotion = emotions.find((entry) => entry.id === item.emotionId)
+    if (!emotion) return
+    const cardIndex = emotion.cards.findIndex((_, index) => `${emotion.id}-${index}` === item.id)
+    const savedCard = cardIndex >= 0 ? emotion.cards[cardIndex] : null
+    setActiveEmotion(emotion)
+    setCard({ id: item.id, text: item.text, companions: savedCard?.companions || [] })
+    setCompanionCount(0)
+    setView('card')
+  }
+
   function showFarewell() {
     const messages = ['门没锁，随时可以回来', '今天到这里也可以', '不用带走什么', '下次想来，再来', '这里一直在']
     setFarewell(messages[Math.floor(Math.random() * messages.length)])
@@ -317,7 +328,7 @@ function App() {
             onBack={leaveCard}
           />
         )}
-        {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
+        {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onOpen={openFavorite} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
         {view === 'about' && <About favoriteCount={favorites.length} confirmClear={confirmClear} onBack={() => { setConfirmClear(false); setView('home') }} onAskClear={() => setConfirmClear(true)} onCancelClear={() => setConfirmClear(false)} onClear={() => { setFavorites([]); setConfirmClear(false) }} />}
       </main>
     </div>
@@ -379,7 +390,7 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
   )
 }
 
-function Favorites({ items, onBack, onRemove }) {
+function Favorites({ items, onBack, onOpen, onRemove }) {
   return (
     <section className="simple-view view-enter">
       <button className="back-button" onClick={onBack}><Icon name="back" />回到首页</button>
@@ -397,8 +408,10 @@ function Favorites({ items, onBack, onRemove }) {
         <div className="favorites-list">
           {[...items].reverse().map((item) => (
             <article className="favorite-item" key={item.id}>
-              <small>{item.emotionLabel}</small>
-              <p>{item.text}</p>
+              <button className="favorite-content" onClick={() => onOpen(item)} aria-label="打开这句话">
+                <small>{item.emotionLabel}</small>
+                <p>{item.text}</p>
+              </button>
               <button className="icon-button remove-button" onClick={() => onRemove(item.id)} title="移出收藏" aria-label="移出收藏"><Icon name="trash" /></button>
             </article>
           ))}

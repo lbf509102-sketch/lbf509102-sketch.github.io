@@ -302,8 +302,19 @@ h1 {
   border-bottom: 1px solid var(--line);
 }
 
-.favorite-item small { color: var(--muted); }
-.favorite-item p { margin: 10px 0 0; font-size: 20px; line-height: 1.75; }
+.favorite-content {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.favorite-content:hover p { color: var(--muted); }
+.favorite-content small { color: var(--muted); }
+.favorite-content p { margin: 10px 0 0; font-size: 20px; line-height: 1.75; }
 .remove-button { position: absolute; top: 22px; right: 0; }
 
 .about-section {
