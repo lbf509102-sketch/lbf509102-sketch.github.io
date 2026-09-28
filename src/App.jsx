@@ -376,6 +376,12 @@ function Home({ onChoose, farewell }) {
 }
 
 function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onNext, onBack }) {
+  const messageRef = useRef(null)
+
+  useEffect(() => {
+    messageRef.current?.focus()
+  }, [card.id])
+
   return (
     <section className="card-view view-enter">
       <button className="back-button" onClick={onBack}><Icon name="back" />换一种状态</button>
@@ -384,7 +390,7 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
           <span className={`emotion-dot ${emotion.tone}`} />
           <span>{emotion.label}</span>
         </div>
-        <p aria-live="polite">{card.text}</p>
+        <p ref={messageRef} tabIndex="-1" aria-live="polite">{card.text}</p>
         <div className="companion-lines" aria-live="polite">
           {companions.slice(0, companionCount).map((line, index) => <p className="companion-line" key={`${emotion.id}-companion-${index}`}>{line}</p>)}
         </div>
