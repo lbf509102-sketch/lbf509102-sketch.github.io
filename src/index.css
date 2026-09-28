@@ -220,6 +220,22 @@ h1 {
   text-wrap: balance;
 }
 
+.companion-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: -24px 0 34px;
+}
+
+.companion-line {
+  margin: 0;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.65;
+  animation: companion-in .8s ease both;
+}
+
 .save-button {
   align-self: flex-end;
   width: 46px;
@@ -314,6 +330,11 @@ h1 {
   to { opacity: 1; }
 }
 
+@keyframes companion-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 600px) {
   .app-shell { padding: 0 18px 32px; }
   .topbar { height: 70px; }
@@ -325,6 +346,8 @@ h1 {
   .emotion-row { min-height: 76px; gap: 14px; }
   .message-card { min-height: 350px; padding: 26px 24px; }
   .message-card > p { margin: 42px 0; line-height: 1.7; }
+  .companion-lines { margin: -16px 0 28px; }
+  .companion-line { font-size: 15px; }
   .data-section { align-items: flex-start; flex-direction: column; }
 }
 

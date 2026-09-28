@@ -18,6 +18,7 @@ const emotions = [
       '今天的你，可以只是安静地存在。',
       '没有感觉的时间，也算时间。',
     ],
+    companions: ['先不用找回什么。', '安静也可以。', '慢一点。', '这里不催你。'],
   },
   {
     id: 'tearless',
@@ -36,6 +37,7 @@ const emotions = [
       '有些难过只是沉着，不会消失。',
       '你可以停在想哭的这一刻。',
     ],
+    companions: ['眼泪不来，也没关系。', '先坐一会儿。', '不用证明。', '不急。'],
   },
   {
     id: 'silent',
@@ -54,6 +56,7 @@ const emotions = [
       '你可以只点点头，也可以什么都不做。',
       '今天的沉默，不需要被纠正。',
     ],
+    companions: ['不用把话补完整。', '安静也可以。', '先不说。', '这里不催你。'],
   },
   {
     id: 'tired',
@@ -72,6 +75,7 @@ const emotions = [
       '慢一点，不代表你落在了哪里。',
       '此刻不往前走，也不需要解释。',
     ],
+    companions: ['今天先放下一点。', '少做一点。', '到这里也可以。', '不急着继续。'],
   },
   {
     id: 'unclear',
@@ -90,6 +94,7 @@ const emotions = [
       '这份说不清，也值得被认真对待。',
       '不知道该从哪里说，就先不开始。',
     ],
+    companions: ['不用现在想明白。', '先放着。', '可以没有答案。', '慢一点。'],
   },
   {
     id: 'alone',
@@ -108,6 +113,7 @@ const emotions = [
       '暂时离远一点，也是一种空间。',
       '这里没有人催你重新热闹起来。',
     ],
+    companions: ['门先关一会儿。', '不用马上回去。', '安静留给你。', '不催。'],
   },
 ]
 
@@ -118,7 +124,6 @@ const icons = {
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>,
   arrow: <><path d="m9 18 6-6-6-6" /></>,
   back: <><path d="m15 18-6-6 6-6" /></>,
-  shuffle: <><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /></>,
   trash: <><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6" /></>,
 }
 
@@ -166,6 +171,7 @@ function App() {
   const [view, setViewState] = useState(readView)
   const [activeEmotion, setActiveEmotion] = useState(null)
   const [card, setCard] = useState(null)
+  const [companionCount, setCompanionCount] = useState(0)
   const [favorites, setFavorites] = useState(loadFavorites)
   const [theme, setTheme] = useState(loadTheme)
   const [confirmClear, setConfirmClear] = useState(false)
@@ -228,8 +234,14 @@ function App() {
 
   function openEmotion(emotion) {
     setActiveEmotion(emotion)
+    setCompanionCount(0)
     pickCard(emotion)
     setView('card')
+  }
+
+  function showNextCompanion() {
+    if (!activeEmotion || companionCount >= activeEmotion.companions.length) return
+    setCompanionCount((count) => count + 1)
   }
 
   function toggleFavorite() {
@@ -268,9 +280,11 @@ function App() {
           <CardView
             emotion={activeEmotion}
             card={card}
+            companions={activeEmotion.companions}
+            companionCount={companionCount}
             isFavorite={isFavorite}
             onFavorite={toggleFavorite}
-            onNext={() => pickCard(activeEmotion)}
+            onStay={showNextCompanion}
             onBack={() => setView('home')}
           />
         )}
@@ -306,7 +320,7 @@ function Home({ onChoose }) {
   )
 }
 
-function CardView({ emotion, card, isFavorite, onFavorite, onNext, onBack }) {
+function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onBack }) {
   return (
     <section className="card-view view-enter">
       <button className="back-button" onClick={onBack}><Icon name="back" />换一种感受</button>
@@ -316,13 +330,16 @@ function CardView({ emotion, card, isFavorite, onFavorite, onNext, onBack }) {
           <span>{emotion.label}</span>
         </div>
         <p aria-live="polite">{card.text}</p>
+        <div className="companion-lines" aria-live="polite">
+          {companions.slice(0, companionCount).map((line) => <p className="companion-line" key={line}>{line}</p>)}
+        </div>
         <button className={`save-button ${isFavorite ? 'saved' : ''}`} onClick={onFavorite} title={isFavorite ? '取消收藏' : '收藏这句话'} aria-label={isFavorite ? '取消收藏这句话' : '收藏这句话'} aria-pressed={isFavorite}>
           <Icon name="heart" filled={isFavorite} />
         </button>
       </article>
-      <div className="card-actions">
-        <button className="text-button" onClick={onNext}><Icon name="shuffle" />再放一张</button>
-      </div>
+      {companionCount < companions.length && <div className="card-actions">
+        <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>
+      </div>}
       <p className="leave-note">你可以停在这里，也可以直接离开。</p>
     </section>
   )
