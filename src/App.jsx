@@ -161,6 +161,14 @@ function readView() {
   return view
 }
 
+function getTimeAtmosphere() {
+  const hour = new Date().getHours()
+  if (hour >= 23 || hour < 5) return { eyebrow: '现在很晚了，也不用急着睡', prompt: '先选一个靠近的就好' }
+  if (hour < 9) return { eyebrow: '今天还没开始，也没关系', prompt: '不用马上进入状态' }
+  if (hour >= 18) return { eyebrow: '今天快结束了，也可以先停一下', prompt: '不用把今天收拾完整' }
+  return { eyebrow: '此刻不用做得更好', prompt: '不用选得准确，选一个靠近的就好' }
+}
+
 function App() {
   const [view, setViewState] = useState(readView)
   const [activeEmotion, setActiveEmotion] = useState(null)
@@ -272,7 +280,10 @@ function App() {
   }
 
   function showFarewell() {
-    const messages = ['门没锁，随时可以回来', '今天到这里也可以', '不用带走什么', '下次想来，再来', '这里一直在']
+    const hour = new Date().getHours()
+    const messages = hour >= 23 || hour < 5
+      ? ['门没锁，随时可以回来', '不用带走什么', '这里一直在']
+      : ['今天到这里也可以', '不用带走什么', '下次想来，再来']
     setFarewell(messages[Math.floor(Math.random() * messages.length)])
     window.clearTimeout(farewellTimer.current)
     farewellTimer.current = window.setTimeout(() => setFarewell(''), 1600)
@@ -336,12 +347,14 @@ function App() {
 }
 
 function Home({ onChoose, farewell }) {
+  const atmosphere = getTimeAtmosphere()
+
   return (
     <section className="home-view view-enter">
       <div className="intro">
-        <p className="eyebrow">此刻不用做得更好</p>
+        <p className="eyebrow">{atmosphere.eyebrow}</p>
         <h1>你现在，比较像哪一种？</h1>
-        <p>不用选得准确，选一个靠近的就好</p>
+        <p>{atmosphere.prompt}</p>
       </div>
       <div className="emotion-list" aria-label="选择此刻的感受">
         {emotions.map((emotion) => (
