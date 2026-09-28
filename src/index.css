@@ -294,13 +294,25 @@ h1 {
 .empty-state p { margin: 0 0 8px; color: var(--text); font-size: 18px; }
 .empty-state span { font-size: 13px; }
 
-.favorites-list { border-top: 1px solid var(--line); }
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 4px 4px;
+}
 
 .favorite-item {
   position: relative;
-  padding: 26px 54px 26px 4px;
-  border-bottom: 1px solid var(--line);
+  padding: 24px 54px 24px 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-strong);
+  box-shadow: 0 10px 24px var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
+
+.favorite-item:nth-child(even) { transform: translateX(8px); }
+.favorite-item:hover { transform: translateY(-2px); box-shadow: 0 14px 28px var(--shadow); }
 
 .favorite-content {
   width: 100%;
@@ -315,7 +327,7 @@ h1 {
 .favorite-content:hover p { color: var(--muted); }
 .favorite-content small { color: var(--muted); }
 .favorite-content p { margin: 10px 0 0; font-size: 20px; line-height: 1.75; }
-.remove-button { position: absolute; top: 22px; right: 0; }
+.remove-button { position: absolute; top: 18px; right: 8px; }
 
 .about-section {
   padding: 26px 0;
