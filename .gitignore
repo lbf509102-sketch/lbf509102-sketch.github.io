@@ -1,0 +1,12 @@
+node_modules/
+dist/
+artifacts/
+playwright-report/
+stay-as-you-are-dist.zip
+
+# Unrelated workspace projects and local assets.
+店小秘上架/
+playwright-study/
+react-basic/
+self-media/
+cat.svg
