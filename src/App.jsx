@@ -175,8 +175,10 @@ function App() {
   const [favorites, setFavorites] = useState(loadFavorites)
   const [theme, setTheme] = useState(loadTheme)
   const [confirmClear, setConfirmClear] = useState(false)
+  const [farewell, setFarewell] = useState('')
   const bags = useRef({})
   const lastPicked = useRef({})
+  const farewellTimer = useRef(null)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -205,6 +207,8 @@ function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [view])
+
+  useEffect(() => () => window.clearTimeout(farewellTimer.current), [])
 
   function setView(nextView) {
     if (nextView === view) return
@@ -244,6 +248,18 @@ function App() {
     setCompanionCount((count) => count + 1)
   }
 
+  function showFarewell() {
+    const messages = ['门没锁，随时可以回来。', '今天到这里也可以。', '不用带走什么。']
+    setFarewell(messages[Math.floor(Math.random() * messages.length)])
+    window.clearTimeout(farewellTimer.current)
+    farewellTimer.current = window.setTimeout(() => setFarewell(''), 1600)
+  }
+
+  function leaveCard() {
+    showFarewell()
+    setView('home')
+  }
+
   function toggleFavorite() {
     if (!card || !activeEmotion) return
     setFavorites((items) => {
@@ -257,7 +273,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={() => setView('home')} aria-label="返回情绪选择">
+        <button className="brand" onClick={view === 'card' ? leaveCard : () => setView('home')} aria-label="返回情绪选择">
           <img src="/mark.svg" alt="" />
           <span>不用好起来</span>
         </button>
@@ -275,7 +291,7 @@ function App() {
       </header>
 
       <main>
-        {view === 'home' && <Home onChoose={openEmotion} />}
+        {view === 'home' && <Home onChoose={openEmotion} farewell={farewell} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
             emotion={activeEmotion}
@@ -285,7 +301,7 @@ function App() {
             isFavorite={isFavorite}
             onFavorite={toggleFavorite}
             onStay={showNextCompanion}
-            onBack={() => setView('home')}
+            onBack={leaveCard}
           />
         )}
         {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
@@ -295,7 +311,7 @@ function App() {
   )
 }
 
-function Home({ onChoose }) {
+function Home({ onChoose, farewell }) {
   return (
     <section className="home-view view-enter">
       <div className="intro">
@@ -315,7 +331,9 @@ function Home({ onChoose }) {
           </button>
         ))}
       </div>
-      <p className="quiet-note">没有记录，没有任务，也没有人催你。</p>
+      <p className={`quiet-note ${farewell ? 'farewell-note' : ''}`} aria-live="polite">
+        {farewell || '没有记录，没有任务，也没有人催你。'}
+      </p>
     </section>
   )
 }
