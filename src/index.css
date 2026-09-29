@@ -40,6 +40,7 @@
 * { box-sizing: border-box; }
 
 html { min-width: 320px; background: var(--bg); }
+html, body { overflow-x: hidden; }
 
 body {
   margin: 0;
@@ -69,6 +70,7 @@ button:focus-visible, a:focus-visible {
   position: relative;
   width: min(100%, 760px);
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: env(safe-area-inset-top) 28px calc(48px + env(safe-area-inset-bottom));
 }
