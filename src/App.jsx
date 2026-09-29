@@ -179,6 +179,11 @@ function getTimeAtmosphere() {
   return { period: 'day', eyebrow: '此刻不用做得更好', prompt: '不用选得准确，选一个靠近的就好' }
 }
 
+function getThemeColor(theme, period) {
+  if (theme === 'dark') return '#191a19'
+  return { night: '#e9dfd2', morning: '#e4eaeb', evening: '#e9e1d9', day: '#ece9e2' }[period]
+}
+
 function App() {
   const [view, setViewState] = useState(readView)
   const [activeEmotion, setActiveEmotion] = useState(null)
@@ -196,13 +201,13 @@ function App() {
   const lastPicked = useRef({})
   const farewellTimer = useRef(null)
 
+  const atmosphere = getTimeAtmosphere()
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     try { localStorage.setItem('quiet-theme-v1', theme) } catch { /* Private browsing may block storage. */ }
-    document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#191a19' : '#ece9e2'
-  }, [theme])
-
-  const atmosphere = getTimeAtmosphere()
+    document.querySelector('meta[name="theme-color"]').content = getThemeColor(theme, atmosphere.period)
+  }, [theme, atmosphere.period])
 
   useEffect(() => {
     document.documentElement.dataset.atmosphere = atmosphere.period
