@@ -126,31 +126,43 @@ const stories = {
     '今天没有什么特别的事 没有开心 也没有不开心 就这样过完了',
     '下午发了好一会儿呆 等回过神 天已经黑了 不知道自己想了什么 好像什么都没想',
     '今天的一切都像隔着一层玻璃 看得见 但摸不到',
+    '晚上躺在床上 刷了很久手机 其实什么也没看进去 就是不想关掉',
+    '今天有人夸我 说我很靠谱 我笑了笑 但心里没什么感觉 好像跟我没什么关系',
   ],
   tearless: [
     '眼眶干了好几天 但胸口一直堵着 说不清堵什么',
     '把手机里的歌切了一首又一首 没有一首能让我哭出来',
     '很想大哭一场 但不知道从哪哭起',
+    '晚上一个人在家 把灯都关了 坐了很久 想哭 但眼睛一直是干的',
+    '有人说我最近看起来挺平静的 我说是吧 其实不是平静 是堵住了',
   ],
   silent: [
     '写了一长段话 又删了 不发了',
     '在群里看着大家聊天 打了一行字 又删掉 最后什么都没发',
     '不想解释为什么不想解释 这本身就要解释',
+    '朋友发来一长段消息 问我是不是生气了 我看了一眼 没回 不知道怎么回 也不想编一个理由',
+    '今天开会被问到意见 我说没什么意见 其实有 但不想说 说了就要解释 解释就要说话 太累了',
   ],
   tired: [
     '今天下班坐在车里 没有马上上楼 坐了二十分钟 也没干什么 就是坐着',
     '今天把要做的事情列了个清单 列完之后 一条都不想动',
     '晚上回到家 鞋都没脱 在门口坐了一会儿 不是不想动 就是觉得进门也要力气',
+    '早上醒来的第一个念头是 又要开始了 然后闭着眼睛又躺了十分钟',
+    '今天有个瞬间想请假 但不知道请假的理由是什么 就继续上班了',
   ],
   unclear: [
     '说不上来哪里不对 就是不对',
     '不知道自己在等什么 但好像在等什么',
     '说不上是难过 说不上是累 说不上是孤独 就是什么都不太对',
+    '今天哭了 但不知道因为什么 就是突然哭了',
+    '有时候觉得挺好的 有时候又觉得不行了 这两个之间隔了不到十分钟',
   ],
   alone: [
     '手机开了免打扰 不是不想理谁 就是想安静一会儿',
     '坐在阳台上看了一会儿天 什么都没想 挺好的',
     '一个人待着的时候 不用说话 不用笑 不用解释 挺好的',
+    '同事约我下班一起吃饭 我说有事 其实没事 就是想一个人待着',
+    '今天在家待了一整天 没开窗帘 没出门 也没觉得不好',
   ],
 }
 
@@ -240,6 +252,7 @@ function App() {
   })
   const bags = useRef({})
   const lastPicked = useRef({})
+  const lastStory = useRef({})
   const farewellTimer = useRef(null)
 
   const atmosphere = getTimeAtmosphere()
@@ -433,9 +446,14 @@ function App() {
   function openStory() {
     const pool = activeEmotion ? stories[activeEmotion.id] : null
     if (!pool?.length) return
-    const picked = pool[Math.floor(Math.random() * pool.length)]
+    let storyIndex = Math.floor(Math.random() * pool.length)
+    if (pool.length > 1 && storyIndex === lastStory.current[activeEmotion.id]) {
+      storyIndex = (storyIndex + 1) % pool.length
+    }
+    lastStory.current[activeEmotion.id] = storyIndex
+    const picked = pool[storyIndex]
     setShareStatus('')
-    setStory({ id: `${activeEmotion.id}-story-${pool.indexOf(picked)}`, text: picked })
+    setStory({ id: `${activeEmotion.id}-story-${storyIndex}`, text: picked })
     setView('story')
   }
 
