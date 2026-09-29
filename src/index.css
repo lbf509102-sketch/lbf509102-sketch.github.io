@@ -198,6 +198,20 @@ h1 {
 
 .unsure-link:hover { color: var(--text); }
 
+.rest-link {
+  display: block;
+  min-height: 40px;
+  margin: 12px auto 0;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--muted) 48%, transparent);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.rest-link:hover { color: var(--text); }
+
 .back-button {
   display: inline-flex;
   align-items: center;
@@ -421,6 +435,17 @@ h1 {
 
 .view-enter { animation: view-in .45s ease both; }
 
+.rest-view { width: min(100%, 620px); min-height: calc(100vh - 142px); margin: 0 auto; }
+.rest-stage { min-height: 62vh; display: grid; place-items: center; }
+.rest-circle {
+  width: clamp(92px, 24vw, 154px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sage) 42%, var(--surface-strong));
+  box-shadow: 0 0 0 18px color-mix(in srgb, var(--sage) 8%, transparent), 0 0 70px color-mix(in srgb, var(--sage) 18%, transparent);
+  animation: rest-breathe 10s ease-in-out infinite;
+}
+
 @keyframes card-in {
   from { opacity: 0; transform: translateY(-14px); }
   to { opacity: 1; transform: translateY(0); }
@@ -452,6 +477,11 @@ h1 {
   100% { opacity: 0; transform: translateY(-2px); }
 }
 
+@keyframes rest-breathe {
+  0%, 100% { transform: scale(.82); opacity: .64; }
+  50% { transform: scale(1); opacity: .92; }
+}
+
 @media (max-width: 600px) {
   .app-shell { padding: env(safe-area-inset-top) 18px calc(32px + env(safe-area-inset-bottom)); }
   .topbar { height: 70px; }
@@ -468,6 +498,7 @@ h1 {
   .companion-lines { margin: -16px 0 28px; }
   .companion-line { font-size: 15px; }
   .data-section { align-items: flex-start; flex-direction: column; }
+  .rest-view { min-height: calc(100vh - 108px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

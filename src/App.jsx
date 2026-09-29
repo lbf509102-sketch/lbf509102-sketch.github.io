@@ -196,8 +196,8 @@ function loadTheme() {
 
 function readView(allowTransient = false) {
   const candidate = window.history.state?.view
-  const view = ['home', 'card', 'story', 'favorites', 'about'].includes(candidate) ? candidate : 'home'
-  if (!allowTransient && (view === 'card' || view === 'story')) {
+  const view = ['home', 'card', 'story', 'rest', 'favorites', 'about'].includes(candidate) ? candidate : 'home'
+  if (!allowTransient && ['card', 'story', 'rest'].includes(view)) {
     window.history.replaceState({ view: 'home' }, '', window.location.pathname)
     return 'home'
   }
@@ -280,6 +280,11 @@ function App() {
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && view !== 'home') {
         setConfirmClear(false)
+        if (view === 'rest') {
+          window.history.replaceState({ view: 'home' }, '', window.location.pathname)
+          setViewState('home')
+          return
+        }
         if (view === 'story') {
           window.history.replaceState({ view: 'card' }, '', window.location.pathname)
           setViewState('card')
@@ -359,6 +364,11 @@ function App() {
     setCard({ id: 'unsure-0', text: quietEmotion.cards[0].text, companions: quietEmotion.cards[0].companions })
     setCompanionCount(0)
     setView('card')
+  }
+
+  function openRestSpace() {
+    setStory(null)
+    setView('rest')
   }
 
   function showNextCompanion() {
@@ -450,7 +460,7 @@ function App() {
       </header>
 
       <main aria-hidden={showWelcome || undefined} inert={showWelcome ? '' : undefined}>
-        {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} atmosphere={atmosphere} />}
+        {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} onRest={openRestSpace} farewell={farewell} atmosphere={atmosphere} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
             key={card.id}
@@ -467,6 +477,7 @@ function App() {
           />
         )}
         {view === 'story' && activeEmotion && story && <StoryView emotion={activeEmotion} story={story} onBack={leaveStory} />}
+        {view === 'rest' && <RestView onBack={() => { window.history.replaceState({ view: 'home' }, '', window.location.pathname); setViewState('home') }} />}
         {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onOpen={openFavorite} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
         {view === 'about' && <About favoriteCount={favorites.length} confirmClear={confirmClear} onBack={() => { setConfirmClear(false); setView('home') }} onAskClear={() => setConfirmClear(true)} onCancelClear={() => setConfirmClear(false)} onClear={() => { setFavorites([]); setConfirmClear(false) }} />}
       </main>
@@ -475,7 +486,7 @@ function App() {
   )
 }
 
-function Home({ onChoose, onUnsure, farewell, atmosphere }) {
+function Home({ onChoose, onUnsure, onRest, farewell, atmosphere }) {
   return (
     <section className="home-view view-enter">
       <div className="intro">
@@ -496,9 +507,21 @@ function Home({ onChoose, onUnsure, farewell, atmosphere }) {
         ))}
       </div>
       <button className="unsure-link" onClick={onUnsure}>不知道选哪个</button>
+      <button className="rest-link" onClick={onRest}>什么都不做</button>
       <p className={`quiet-note ${farewell ? 'farewell-note' : ''}`} aria-live="polite">
         {farewell || '没有记录，没有任务，也没有人催你'}
       </p>
+    </section>
+  )
+}
+
+function RestView({ onBack }) {
+  return (
+    <section className="rest-view view-enter" aria-label="什么都不做">
+      <button className="back-button" onClick={onBack}><Icon name="back" />回到首页</button>
+      <div className="rest-stage" aria-hidden="true">
+        <span className="rest-circle" />
+      </div>
     </section>
   )
 }
