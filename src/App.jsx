@@ -156,6 +156,7 @@ const stories = {
 
 const icons = {
   heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />,
+  share: <><path d="M12 16V3M7 8l5-5 5 5" /><path d="M5 13v7h14v-7" /></>,
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
   moon: <path d="M20.5 14.4A8 8 0 0 1 9.6 3.5 8.5 8.5 0 1 0 20.5 14.4Z" />,
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>,
@@ -222,6 +223,7 @@ function App() {
   const [activeEmotion, setActiveEmotion] = useState(null)
   const [card, setCard] = useState(null)
   const [story, setStory] = useState(null)
+  const [shareStatus, setShareStatus] = useState('')
   const [companionCount, setCompanionCount] = useState(0)
   const [favorites, setFavorites] = useState(loadFavorites)
   const [theme, setTheme] = useState(loadTheme)
@@ -352,6 +354,7 @@ function App() {
     setCardOrigin('home')
     setActiveEmotion(emotion)
     setStory(null)
+    setShareStatus('')
     setCompanionCount(0)
     pickCard(emotion)
     setView('card')
@@ -361,6 +364,7 @@ function App() {
     setCardOrigin('home')
     setActiveEmotion(quietEmotion)
     setStory(null)
+    setShareStatus('')
     setCard({ id: 'unsure-0', text: quietEmotion.cards[0].text, companions: quietEmotion.cards[0].companions })
     setCompanionCount(0)
     setView('card')
@@ -378,6 +382,7 @@ function App() {
 
   function showNextCard() {
     if (!activeEmotion) return
+    setShareStatus('')
     setCompanionCount(0)
     pickCard(activeEmotion)
     window.scrollTo(0, 0)
@@ -391,6 +396,7 @@ function App() {
     setCardOrigin('favorites')
     setActiveEmotion(emotion)
     setStory(null)
+    setShareStatus('')
     setCard({ id: item.id, text: item.text, companions: savedCard?.companions || [] })
     setCompanionCount(0)
     setView('card')
@@ -420,6 +426,7 @@ function App() {
     const pool = activeEmotion ? stories[activeEmotion.id] : null
     if (!pool?.length) return
     const picked = pool[Math.floor(Math.random() * pool.length)]
+    setShareStatus('')
     setStory({ id: `${activeEmotion.id}-story-${pool.indexOf(picked)}`, text: picked })
     setView('story')
   }
@@ -435,6 +442,26 @@ function App() {
       if (items.some((item) => item.id === card.id)) return items.filter((item) => item.id !== card.id)
       return [...items, { ...card, emotionId: activeEmotion.id, emotionLabel: activeEmotion.label }]
     })
+  }
+
+  async function shareCard() {
+    if (!card) return
+    const payload = { title: '不用好起来', text: card.text }
+    setShareStatus('')
+    if (navigator.share) {
+      try {
+        await navigator.share(payload)
+        return
+      } catch (error) {
+        if (error.name === 'AbortError') return
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(card.text)
+      setShareStatus('已经复制这句话')
+    } catch {
+      setShareStatus('这个设备暂时无法分享')
+    }
   }
 
   const isFavorite = card && favorites.some((item) => item.id === card.id)
@@ -470,6 +497,8 @@ function App() {
             companionCount={companionCount}
             isFavorite={isFavorite}
             onFavorite={toggleFavorite}
+            shareStatus={shareStatus}
+            onShare={shareCard}
             onStay={showNextCompanion}
             onNext={showNextCard}
             onStory={openStory}
@@ -526,7 +555,7 @@ function RestView({ onBack }) {
   )
 }
 
-function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onNext, onStory, onBack }) {
+function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, shareStatus, onShare, onStay, onNext, onStory, onBack }) {
   const messageRef = useRef(null)
 
   useEffect(() => {
@@ -545,9 +574,14 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
         <div className="companion-lines" aria-live="polite">
           {companions.slice(0, companionCount).map((line, index) => <p className="companion-line" key={`${emotion.id}-companion-${index}`}>{line}</p>)}
         </div>
-        <button className={`save-button ${isFavorite ? 'saved' : ''}`} onClick={onFavorite} title={isFavorite ? '取消收藏' : '收藏这句话'} aria-label={isFavorite ? '取消收藏这句话' : '收藏这句话'} aria-pressed={isFavorite}>
-          <Icon name="heart" filled={isFavorite} />
-        </button>
+        <div className="card-utility-actions">
+          <button className={`save-button ${isFavorite ? 'saved' : ''}`} onClick={onFavorite} title={isFavorite ? '取消收藏' : '收藏这句话'} aria-label={isFavorite ? '取消收藏这句话' : '收藏这句话'} aria-pressed={isFavorite}>
+            <Icon name="heart" filled={isFavorite} />
+          </button>
+          <button className="save-button share-button" onClick={onShare} title="分享这句话" aria-label="分享这句话">
+            <Icon name="share" />
+          </button>
+        </div>
       </article>
       <div className="card-actions">
         <button
@@ -563,6 +597,7 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
       <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>
         {emotion.cards.length > 1 ? '可以停在这里，也可以看下一张卡片' : '可以停在这里'}
       </p>
+      <p className="share-status" role="status" aria-live="polite">{shareStatus}</p>
     </section>
   )
 }

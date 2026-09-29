@@ -309,8 +309,13 @@ h1 {
 .companion-line:nth-child(3) { font-size: 14px; opacity: .72; }
 .companion-line:nth-child(4) { font-size: 13px; opacity: .58; }
 
-.save-button {
+.card-utility-actions {
   align-self: flex-end;
+  display: flex;
+  gap: 8px;
+}
+
+.save-button {
   width: 46px;
   height: 46px;
   display: grid;
@@ -324,6 +329,7 @@ h1 {
 
 .save-button:hover, .save-button.saved { color: var(--rose); border-color: var(--rose); }
 .save-button svg { width: 22px; height: 22px; }
+.share-button:hover { color: var(--text); border-color: var(--text); }
 .card-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
 
 .text-button, .danger-button {
@@ -342,6 +348,7 @@ h1 {
 
 .text-button:hover { background: var(--surface-strong); }
 .story-button { color: var(--muted); }
+.share-status { min-height: 18px; margin: 8px 0 0; color: var(--muted); text-align: center; font-size: 12px; }
 .stay-button { transition: opacity .8s ease, transform .8s ease; }
 .stay-button.settled { opacity: 0; transform: translateY(5px); pointer-events: none; }
 
