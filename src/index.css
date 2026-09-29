@@ -39,7 +39,7 @@
 
 * { box-sizing: border-box; }
 
-html { min-width: 320px; background: var(--bg); }
+html { min-width: 320px; background: var(--bg); scrollbar-gutter: stable; }
 html, body { overflow-x: hidden; }
 
 body {

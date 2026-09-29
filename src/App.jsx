@@ -377,7 +377,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar" aria-hidden={showWelcome || undefined} inert={showWelcome ? '' : undefined}>
-        <button className="brand" onClick={view === 'card' ? leaveCard : () => setView('home')} aria-label="返回情绪选择">
+        <button className="brand" onClick={view === 'card' ? leaveCard : () => setView('home')} aria-label={view === 'home' ? '不用好起来首页' : '返回情绪选择'}>
           <img src="/mark.svg" alt="" />
           <span>不用好起来</span>
         </button>
@@ -398,6 +398,7 @@ function App() {
         {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} atmosphere={atmosphere} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
+            key={card.id}
             emotion={activeEmotion}
             card={card}
             companions={card.companions}
@@ -425,7 +426,7 @@ function Home({ onChoose, onUnsure, farewell, atmosphere }) {
         <h1>你现在，比较像哪一种？</h1>
         <p>{atmosphere.prompt}</p>
       </div>
-      <div className="emotion-list" aria-label="选择此刻的感受">
+      <div className="emotion-list" role="group" aria-label="选择此刻的感受">
         {emotions.map((emotion) => (
           <button key={emotion.id} className="emotion-row" onClick={() => onChoose(emotion)}>
             <span className={`emotion-dot ${emotion.tone}`} />
@@ -526,8 +527,8 @@ function About({ favoriteCount, confirmClear, onBack, onAskClear, onCancelClear,
       </div>
       <div className="about-section manifesto-section">
         <h2>这里不做什么</h2>
-        <div className="not-list" aria-label="这里不做什么">
-          <span>不登录</span><span>不上传</span><span>不画像</span><span>不推送</span><span>不评价</span>
+        <div className="not-list" role="list" aria-label="这里不做什么">
+          <span role="listitem">不登录</span><span role="listitem">不上传</span><span role="listitem">不画像</span><span role="listitem">不推送</span><span role="listitem">不评价</span>
         </div>
         <p>收藏与主题偏好只保存在这台设备的浏览器中，不会上传</p>
         <p>它只陪你坐一会儿</p>
