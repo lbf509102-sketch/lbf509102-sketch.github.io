@@ -333,7 +333,7 @@ function App() {
   }
 
   function openFavorite(item) {
-    const emotion = emotions.find((entry) => entry.id === item.emotionId)
+    const emotion = [...emotions, quietEmotion].find((entry) => entry.id === item.emotionId)
     if (!emotion) return
     const cardIndex = emotion.cards.findIndex((_, index) => `${emotion.id}-${index}` === item.id)
     const savedCard = cardIndex >= 0 ? emotion.cards[cardIndex] : null
