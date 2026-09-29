@@ -246,6 +246,35 @@ h1 {
   animation: text-breathe 10s ease-in-out infinite;
 }
 
+.story-card {
+  position: relative;
+  min-height: 370px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-top: 4px solid currentColor;
+  border-radius: 6px;
+  background: var(--surface-strong);
+  box-shadow: 0 18px 45px var(--shadow);
+  animation: card-in 1.2s cubic-bezier(.22, .72, .24, 1) both;
+}
+
+.story-card > p {
+  margin: 48px 0;
+  color: var(--text);
+  font-size: clamp(20px, 4vw, 27px);
+  line-height: 2;
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+.story-source {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .companion-lines {
   display: flex;
   flex-direction: column;
@@ -298,6 +327,7 @@ h1 {
 }
 
 .text-button:hover { background: var(--surface-strong); }
+.story-button { color: var(--muted); }
 .stay-button { transition: opacity .8s ease, transform .8s ease; }
 .stay-button.settled { opacity: 0; transform: translateY(5px); pointer-events: none; }
 
@@ -433,6 +463,8 @@ h1 {
   .emotion-row { min-height: 76px; gap: 14px; }
   .message-card { min-height: 350px; padding: 26px 24px; }
   .message-card > p { margin: 42px 0; line-height: 1.7; }
+  .story-card { min-height: 350px; padding: 26px 24px; }
+  .story-card > p { margin: 38px 0; font-size: 20px; line-height: 1.9; }
   .companion-lines { margin: -16px 0 28px; }
   .companion-line { font-size: 15px; }
   .data-section { align-items: flex-start; flex-direction: column; }

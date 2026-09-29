@@ -121,6 +121,39 @@ const quietEmotion = {
   }],
 }
 
+const stories = {
+  numb: [
+    '今天没有什么特别的事 没有开心 也没有不开心 就这样过完了',
+    '下午发了好一会儿呆 等回过神 天已经黑了 不知道自己想了什么 好像什么都没想',
+    '今天的一切都像隔着一层玻璃 看得见 但摸不到',
+  ],
+  tearless: [
+    '眼眶干了好几天 但胸口一直堵着 说不清堵什么',
+    '把手机里的歌切了一首又一首 没有一首能让我哭出来',
+    '很想大哭一场 但不知道从哪哭起',
+  ],
+  silent: [
+    '写了一长段话 又删了 不发了',
+    '在群里看着大家聊天 打了一行字 又删掉 最后什么都没发',
+    '不想解释为什么不想解释 这本身就要解释',
+  ],
+  tired: [
+    '今天下班坐在车里 没有马上上楼 坐了二十分钟 也没干什么 就是坐着',
+    '今天把要做的事情列了个清单 列完之后 一条都不想动',
+    '晚上回到家 鞋都没脱 在门口坐了一会儿 不是不想动 就是觉得进门也要力气',
+  ],
+  unclear: [
+    '说不上来哪里不对 就是不对',
+    '不知道自己在等什么 但好像在等什么',
+    '说不上是难过 说不上是累 说不上是孤独 就是什么都不太对',
+  ],
+  alone: [
+    '手机开了免打扰 不是不想理谁 就是想安静一会儿',
+    '坐在阳台上看了一会儿天 什么都没想 挺好的',
+    '一个人待着的时候 不用说话 不用笑 不用解释 挺好的',
+  ],
+}
+
 const icons = {
   heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />,
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
@@ -163,8 +196,8 @@ function loadTheme() {
 
 function readView() {
   const candidate = window.history.state?.view
-  const view = ['home', 'card', 'favorites', 'about'].includes(candidate) ? candidate : 'home'
-  if (view === 'card') {
+  const view = ['home', 'card', 'story', 'favorites', 'about'].includes(candidate) ? candidate : 'home'
+  if (view === 'card' || view === 'story') {
     window.history.replaceState({ view: 'home' }, '', window.location.pathname)
     return 'home'
   }
@@ -188,6 +221,7 @@ function App() {
   const [view, setViewState] = useState(readView)
   const [activeEmotion, setActiveEmotion] = useState(null)
   const [card, setCard] = useState(null)
+  const [story, setStory] = useState(null)
   const [companionCount, setCompanionCount] = useState(0)
   const [favorites, setFavorites] = useState(loadFavorites)
   const [theme, setTheme] = useState(loadTheme)
@@ -246,6 +280,11 @@ function App() {
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && view !== 'home') {
         setConfirmClear(false)
+        if (view === 'story') {
+          window.history.replaceState({ view: 'card' }, '', window.location.pathname)
+          setViewState('card')
+          return
+        }
         if (view === 'card') {
           if (cardOrigin === 'favorites') {
             window.history.replaceState({ view: 'favorites' }, '', window.location.pathname)
@@ -307,6 +346,7 @@ function App() {
   function openEmotion(emotion) {
     setCardOrigin('home')
     setActiveEmotion(emotion)
+    setStory(null)
     setCompanionCount(0)
     pickCard(emotion)
     setView('card')
@@ -315,6 +355,7 @@ function App() {
   function openQuietSpace() {
     setCardOrigin('home')
     setActiveEmotion(quietEmotion)
+    setStory(null)
     setCard({ id: 'unsure-0', text: quietEmotion.cards[0].text, companions: quietEmotion.cards[0].companions })
     setCompanionCount(0)
     setView('card')
@@ -339,6 +380,7 @@ function App() {
     const savedCard = cardIndex >= 0 ? emotion.cards[cardIndex] : null
     setCardOrigin('favorites')
     setActiveEmotion(emotion)
+    setStory(null)
     setCard({ id: item.id, text: item.text, companions: savedCard?.companions || [] })
     setCompanionCount(0)
     setView('card')
@@ -364,6 +406,19 @@ function App() {
     setView('home')
   }
 
+  function openStory() {
+    const pool = activeEmotion ? stories[activeEmotion.id] : null
+    if (!pool?.length) return
+    const picked = pool[Math.floor(Math.random() * pool.length)]
+    setStory({ id: `${activeEmotion.id}-story-${pool.indexOf(picked)}`, text: picked })
+    setView('story')
+  }
+
+  function leaveStory() {
+    window.history.replaceState({ view: 'card' }, '', window.location.pathname)
+    setViewState('card')
+  }
+
   function toggleFavorite() {
     if (!card || !activeEmotion) return
     setFavorites((items) => {
@@ -377,7 +432,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar" aria-hidden={showWelcome || undefined} inert={showWelcome ? '' : undefined}>
-        <button className="brand" onClick={view === 'card' ? leaveCard : () => setView('home')} aria-label={view === 'home' ? '不用好起来首页' : '返回情绪选择'}>
+        <button className="brand" onClick={view === 'card' ? leaveCard : view === 'story' ? leaveStory : () => setView('home')} aria-label={view === 'home' ? '不用好起来首页' : '返回情绪选择'}>
           <img src="/mark.svg" alt="" />
           <span>不用好起来</span>
         </button>
@@ -407,9 +462,11 @@ function App() {
             onFavorite={toggleFavorite}
             onStay={showNextCompanion}
             onNext={showNextCard}
+            onStory={openStory}
             onBack={leaveCard}
           />
         )}
+        {view === 'story' && activeEmotion && story && <StoryView emotion={activeEmotion} story={story} onBack={leaveStory} />}
         {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onOpen={openFavorite} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
         {view === 'about' && <About favoriteCount={favorites.length} confirmClear={confirmClear} onBack={() => { setConfirmClear(false); setView('home') }} onAskClear={() => setConfirmClear(true)} onCancelClear={() => setConfirmClear(false)} onClear={() => { setFavorites([]); setConfirmClear(false) }} />}
       </main>
@@ -446,7 +503,7 @@ function Home({ onChoose, onUnsure, farewell, atmosphere }) {
   )
 }
 
-function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onNext, onBack }) {
+function CardView({ emotion, card, companions, companionCount, isFavorite, onFavorite, onStay, onNext, onStory, onBack }) {
   const messageRef = useRef(null)
 
   useEffect(() => {
@@ -478,10 +535,34 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
           aria-label="再坐一会儿"
         >再坐一会儿</button>
         {emotion.cards.length > 1 && <button className="text-button" onClick={onNext} aria-label="看下一张卡片">下一张卡片</button>}
+        {stories[emotion.id]?.length > 0 && <button className="text-button story-button" onClick={onStory}>听一句别人的话</button>}
       </div>
       <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>
         {emotion.cards.length > 1 ? '可以停在这里，也可以看下一张卡片' : '可以停在这里'}
       </p>
+    </section>
+  )
+}
+
+function StoryView({ emotion, story, onBack }) {
+  const storyRef = useRef(null)
+
+  useEffect(() => {
+    storyRef.current?.focus()
+  }, [story.id])
+
+  return (
+    <section className="card-view view-enter">
+      <button className="back-button" onClick={onBack}><Icon name="back" />回到这张卡片</button>
+      <article className={`story-card ${emotion.tone}`}>
+        <div className="card-meta">
+          <span className={`emotion-dot ${emotion.tone}`} />
+          <span>有人留过</span>
+        </div>
+        <p ref={storyRef} tabIndex="-1" aria-live="polite">{story.text}</p>
+        <span className="story-source">没有署名，也不用回应</span>
+      </article>
+      <p className="leave-note">看完就可以离开</p>
     </section>
   )
 }
