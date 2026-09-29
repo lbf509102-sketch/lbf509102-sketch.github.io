@@ -527,9 +527,9 @@ function About({ favoriteCount, confirmClear, onBack, onAskClear, onCancelClear,
       <div className="about-section manifesto-section">
         <h2>这里不做什么</h2>
         <div className="not-list" aria-label="这里不做什么">
-          <span>不登录</span><span>不记录</span><span>不分析</span><span>不推送</span><span>不评价</span>
+          <span>不登录</span><span>不上传</span><span>不画像</span><span>不推送</span><span>不评价</span>
         </div>
-        <p>收藏与主题偏好只保存在这台设备的浏览器中</p>
+        <p>收藏与主题偏好只保存在这台设备的浏览器中，不会上传</p>
         <p>它只陪你坐一会儿</p>
       </div>
       <div className="about-section support-section">
@@ -540,7 +540,7 @@ function About({ favoriteCount, confirmClear, onBack, onAskClear, onCancelClear,
       <div className="about-section data-section">
         <div>
           <h2>本地数据</h2>
-          <p>当前有 {favoriteCount} 条收藏</p>
+          <p>收藏只留在这台设备里</p>
         </div>
         {confirmClear ? (
           <div className="confirm-actions" role="group" aria-label="确认清空收藏">
