@@ -194,6 +194,7 @@ function App() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [farewell, setFarewell] = useState('')
   const [cardOrigin, setCardOrigin] = useState('home')
+  const [, refreshTime] = useState(0)
   const [showWelcome, setShowWelcome] = useState(() => {
     try { return sessionStorage.getItem('quiet-welcome-v1') !== 'seen' } catch { return true }
   })
@@ -202,6 +203,16 @@ function App() {
   const farewellTimer = useRef(null)
 
   const atmosphere = getTimeAtmosphere()
+
+  useEffect(() => {
+    const updateTime = () => refreshTime(Date.now())
+    const timer = window.setInterval(updateTime, 60_000)
+    window.addEventListener('focus', updateTime)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', updateTime)
+    }
+  }, [])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
