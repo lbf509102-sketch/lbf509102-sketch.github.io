@@ -173,10 +173,10 @@ function readView() {
 
 function getTimeAtmosphere() {
   const hour = new Date().getHours()
-  if (hour >= 23 || hour < 5) return { eyebrow: '现在很晚了，也不用急着睡', prompt: '先选一个靠近的就好' }
-  if (hour < 9) return { eyebrow: '今天还没开始，也没关系', prompt: '不用马上进入状态' }
-  if (hour >= 18) return { eyebrow: '今天快结束了，也可以先停一下', prompt: '不用把今天收拾完整' }
-  return { eyebrow: '此刻不用做得更好', prompt: '不用选得准确，选一个靠近的就好' }
+  if (hour >= 23 || hour < 5) return { period: 'night', eyebrow: '现在很晚了，也不用急着睡', prompt: '先选一个靠近的就好' }
+  if (hour < 9) return { period: 'morning', eyebrow: '今天还没开始，也没关系', prompt: '不用马上进入状态' }
+  if (hour >= 18) return { period: 'evening', eyebrow: '今天快结束了，也可以先停一下', prompt: '不用把今天收拾完整' }
+  return { period: 'day', eyebrow: '此刻不用做得更好', prompt: '不用选得准确，选一个靠近的就好' }
 }
 
 function App() {
@@ -201,6 +201,12 @@ function App() {
     try { localStorage.setItem('quiet-theme-v1', theme) } catch { /* Private browsing may block storage. */ }
     document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#191a19' : '#ece9e2'
   }, [theme])
+
+  const atmosphere = getTimeAtmosphere()
+
+  useEffect(() => {
+    document.documentElement.dataset.atmosphere = atmosphere.period
+  }, [atmosphere.period])
 
   useEffect(() => {
     try { localStorage.setItem('quiet-favorites-v1', JSON.stringify(favorites)) } catch { /* Favorites remain available for this session. */ }
@@ -369,7 +375,7 @@ function App() {
       </header>
 
       <main>
-        {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} />}
+        {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} atmosphere={atmosphere} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
             emotion={activeEmotion}
@@ -391,9 +397,7 @@ function App() {
   )
 }
 
-function Home({ onChoose, onUnsure, farewell }) {
-  const atmosphere = getTimeAtmosphere()
-
+function Home({ onChoose, onUnsure, farewell, atmosphere }) {
   return (
     <section className="home-view view-enter">
       <div className="intro">

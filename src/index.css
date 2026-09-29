@@ -48,7 +48,13 @@ body {
   background-color: var(--bg);
   background-image: url('/paper.svg');
   color: var(--text);
+  transition: background-color .8s ease;
 }
+
+:root[data-atmosphere='night'] body { background-color: color-mix(in srgb, var(--bg) 95%, #86694f); }
+:root[data-atmosphere='morning'] body { background-color: color-mix(in srgb, var(--bg) 96%, #7e98a4); }
+:root[data-atmosphere='evening'] body { background-color: color-mix(in srgb, var(--bg) 96%, #9b785c); }
+:root[data-atmosphere='day'] body { background-color: var(--bg); }
 
 button, a { -webkit-tap-highlight-color: transparent; }
 
