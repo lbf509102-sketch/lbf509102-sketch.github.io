@@ -218,6 +218,10 @@ function getThemeColor(theme, period) {
   return { night: '#e9dfd2', morning: '#e4eaeb', evening: '#e9e1d9', day: '#ece9e2' }[period]
 }
 
+function giveTouchFeedback(duration = 8) {
+  try { navigator.vibrate?.(duration) } catch { /* Haptics are optional. */ }
+}
+
 function App() {
   const [view, setViewState] = useState(readView)
   const [activeEmotion, setActiveEmotion] = useState(null)
@@ -377,11 +381,15 @@ function App() {
 
   function showNextCompanion() {
     if (!card || companionCount >= card.companions.length) return
-    setCompanionCount((count) => count + 1)
+    setCompanionCount((count) => {
+      giveTouchFeedback(Math.max(2, 10 - count * 2))
+      return count + 1
+    })
   }
 
   function showNextCard() {
     if (!activeEmotion) return
+    giveTouchFeedback(8)
     setShareStatus('')
     setCompanionCount(0)
     pickCard(activeEmotion)
@@ -446,7 +454,8 @@ function App() {
 
   async function shareCard() {
     if (!card) return
-    const payload = { title: '不用好起来', text: card.text }
+    const shareText = `不用好起来\n\n${card.text}`
+    const payload = { title: '不用好起来', text: shareText }
     setShareStatus('')
     if (navigator.share) {
       try {
@@ -457,7 +466,7 @@ function App() {
       }
     }
     try {
-      await navigator.clipboard.writeText(card.text)
+      await navigator.clipboard.writeText(shareText)
       setShareStatus('已经复制这句话')
     } catch {
       setShareStatus('这个设备暂时无法分享')
