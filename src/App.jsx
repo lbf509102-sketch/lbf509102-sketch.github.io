@@ -194,10 +194,10 @@ function loadTheme() {
   }
 }
 
-function readView() {
+function readView(allowTransient = false) {
   const candidate = window.history.state?.view
   const view = ['home', 'card', 'story', 'favorites', 'about'].includes(candidate) ? candidate : 'home'
-  if (view === 'card' || view === 'story') {
+  if (!allowTransient && (view === 'card' || view === 'story')) {
     window.history.replaceState({ view: 'home' }, '', window.location.pathname)
     return 'home'
   }
@@ -268,7 +268,7 @@ function App() {
 
   useEffect(() => {
     const onPopState = () => {
-      const nextView = readView()
+      const nextView = readView(true)
       if (view === 'card' && nextView === 'home') showFarewell()
       setViewState(nextView)
     }
