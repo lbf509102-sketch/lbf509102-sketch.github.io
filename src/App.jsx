@@ -361,7 +361,7 @@ function App() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
+      <header className="topbar" aria-hidden={showWelcome || undefined} inert={showWelcome ? '' : undefined}>
         <button className="brand" onClick={view === 'card' ? leaveCard : () => setView('home')} aria-label="返回情绪选择">
           <img src="/mark.svg" alt="" />
           <span>不用好起来</span>
@@ -379,7 +379,7 @@ function App() {
         </nav>
       </header>
 
-      <main>
+      <main aria-hidden={showWelcome || undefined} inert={showWelcome ? '' : undefined}>
         {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} atmosphere={atmosphere} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
