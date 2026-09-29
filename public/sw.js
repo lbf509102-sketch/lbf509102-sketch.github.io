@@ -1,4 +1,4 @@
-const CACHE = 'quiet-space-v2'
+const CACHE = 'quiet-space-v3'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.add('/')))
