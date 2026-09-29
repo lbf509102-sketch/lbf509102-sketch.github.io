@@ -225,6 +225,10 @@ function App() {
   }, [atmosphere.period])
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [view])
+
+  useEffect(() => {
     try { localStorage.setItem('quiet-favorites-v1', JSON.stringify(favorites)) } catch { /* Favorites remain available for this session. */ }
   }, [favorites])
 
