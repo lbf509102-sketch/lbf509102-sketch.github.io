@@ -445,7 +445,13 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
         </button>
       </article>
       <div className="card-actions">
-        {companionCount < companions.length && <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>}
+        <button
+          className={`text-button stay-button ${companionCount === companions.length ? 'settled' : ''}`}
+          onClick={onStay}
+          disabled={companionCount === companions.length}
+          aria-hidden={companionCount === companions.length}
+          aria-label="再坐一会儿"
+        >再坐一会儿</button>
         {emotion.cards.length > 1 && <button className="text-button" onClick={onNext} aria-label="看下一张卡片">下一张卡片</button>}
       </div>
       <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>

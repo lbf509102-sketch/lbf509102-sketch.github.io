@@ -290,6 +290,8 @@ h1 {
 }
 
 .text-button:hover { background: var(--surface-strong); }
+.stay-button { transition: opacity .8s ease, transform .8s ease; }
+.stay-button.settled { opacity: 0; transform: translateY(5px); pointer-events: none; }
 
 .section-heading { margin-bottom: 34px; }
 .section-heading h1 { max-width: 560px; }
@@ -429,5 +431,5 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
