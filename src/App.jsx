@@ -111,6 +111,16 @@ const emotions = [
   },
 ]
 
+const quietEmotion = {
+  id: 'unsure',
+  label: '不知道选哪个',
+  tone: 'sage',
+  cards: [{
+    text: '那就先不选',
+    companions: ['不选也可以', '先在这里', '不用急着知道', '可以停在这里'],
+  }],
+}
+
 const icons = {
   heart: <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />,
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
@@ -179,6 +189,9 @@ function App() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [farewell, setFarewell] = useState('')
   const [cardOrigin, setCardOrigin] = useState('home')
+  const [showWelcome, setShowWelcome] = useState(() => {
+    try { return sessionStorage.getItem('quiet-welcome-v1') !== 'seen' } catch { return true }
+  })
   const bags = useRef({})
   const lastPicked = useRef({})
   const farewellTimer = useRef(null)
@@ -224,9 +237,19 @@ function App() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [view])
+  }, [view, cardOrigin])
 
   useEffect(() => () => window.clearTimeout(farewellTimer.current), [])
+
+  useEffect(() => {
+    if (!showWelcome) return undefined
+    const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1600
+    const timer = window.setTimeout(() => {
+      setShowWelcome(false)
+      try { sessionStorage.setItem('quiet-welcome-v1', 'seen') } catch { /* Welcome still dismisses for this render. */ }
+    }, delay)
+    return () => window.clearTimeout(timer)
+  }, [showWelcome])
 
   function setView(nextView) {
     if (nextView === view) return
@@ -260,6 +283,14 @@ function App() {
     setActiveEmotion(emotion)
     setCompanionCount(0)
     pickCard(emotion)
+    setView('card')
+  }
+
+  function openQuietSpace() {
+    setCardOrigin('home')
+    setActiveEmotion(quietEmotion)
+    setCard({ id: 'unsure-0', text: quietEmotion.cards[0].text, companions: quietEmotion.cards[0].companions })
+    setCompanionCount(0)
     setView('card')
   }
 
@@ -338,7 +369,7 @@ function App() {
       </header>
 
       <main>
-        {view === 'home' && <Home onChoose={openEmotion} farewell={farewell} />}
+        {view === 'home' && <Home onChoose={openEmotion} onUnsure={openQuietSpace} farewell={farewell} />}
         {view === 'card' && activeEmotion && card && (
           <CardView
             emotion={activeEmotion}
@@ -355,11 +386,12 @@ function App() {
         {view === 'favorites' && <Favorites items={favorites} onBack={() => setView('home')} onOpen={openFavorite} onRemove={(id) => setFavorites((items) => items.filter((item) => item.id !== id))} />}
         {view === 'about' && <About favoriteCount={favorites.length} confirmClear={confirmClear} onBack={() => { setConfirmClear(false); setView('home') }} onAskClear={() => setConfirmClear(true)} onCancelClear={() => setConfirmClear(false)} onClear={() => { setFavorites([]); setConfirmClear(false) }} />}
       </main>
+      {showWelcome && <div className="welcome-screen" role="status" aria-live="polite"><span>你来了</span></div>}
     </div>
   )
 }
 
-function Home({ onChoose, farewell }) {
+function Home({ onChoose, onUnsure, farewell }) {
   const atmosphere = getTimeAtmosphere()
 
   return (
@@ -381,6 +413,7 @@ function Home({ onChoose, farewell }) {
           </button>
         ))}
       </div>
+      <button className="unsure-link" onClick={onUnsure}>不知道选哪个</button>
       <p className={`quiet-note ${farewell ? 'farewell-note' : ''}`} aria-live="polite">
         {farewell || '没有记录，没有任务，也没有人催你'}
       </p>
@@ -413,10 +446,10 @@ function CardView({ emotion, card, companions, companionCount, isFavorite, onFav
       </article>
       <div className="card-actions">
         {companionCount < companions.length && <button className="text-button" onClick={onStay} aria-label="再坐一会儿">再坐一会儿</button>}
-        <button className="text-button" onClick={onNext} aria-label="看下一张卡片">下一张卡片</button>
+        {emotion.cards.length > 1 && <button className="text-button" onClick={onNext} aria-label="看下一张卡片">下一张卡片</button>}
       </div>
       <p className={`leave-note ${companionCount === companions.length ? 'settled' : ''}`}>
-        可以停在这里，也可以看下一张卡片
+        {emotion.cards.length > 1 ? '可以停在这里，也可以看下一张卡片' : '可以停在这里'}
       </p>
     </section>
   )
@@ -427,7 +460,7 @@ function Favorites({ items, onBack, onOpen, onRemove }) {
     <section className="simple-view view-enter">
       <button className="back-button" onClick={onBack}><Icon name="back" />回到首页</button>
       <div className="section-heading">
-        <p className="eyebrow">只留在这台设备里</p>
+        <p className="eyebrow">你收下了这些</p>
         <h1>收下的话</h1>
       </div>
       {items.length === 0 ? (
@@ -461,9 +494,13 @@ function About({ favoriteCount, confirmClear, onBack, onAskClear, onCancelClear,
         <p className="eyebrow">关于这个空间</p>
         <h1>它只陪你坐一会儿</h1>
       </div>
-      <div className="about-section">
-        <h2>隐私</h2>
-        <p>无需登录，不上传你的选择和收藏，不接入广告或用户画像，收藏与主题偏好只保存在这台设备的浏览器中</p>
+      <div className="about-section manifesto-section">
+        <h2>这里不做什么</h2>
+        <div className="not-list" aria-label="这里不做什么">
+          <span>不登录</span><span>不记录</span><span>不分析</span><span>不推送</span><span>不评价</span>
+        </div>
+        <p>收藏与主题偏好只保存在这台设备的浏览器中</p>
+        <p>它只陪你坐一会儿</p>
       </div>
       <div className="about-section support-section">
         <h2>当你正处在危险中</h2>

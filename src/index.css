@@ -60,6 +60,7 @@ button:focus-visible, a:focus-visible {
 }
 
 .app-shell {
+  position: relative;
   width: min(100%, 760px);
   min-height: 100vh;
   margin: 0 auto;
@@ -176,6 +177,19 @@ h1 {
 .farewell-note { animation: farewell-in 1.6s ease both; }
 .leave-note.settled { opacity: .72; }
 
+.unsure-link {
+  display: block;
+  margin: 20px auto 0;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--muted) 68%, transparent);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.unsure-link:hover { color: var(--text); }
+
 .back-button {
   display: inline-flex;
   align-items: center;
@@ -202,7 +216,7 @@ h1 {
   border-radius: 6px;
   background: var(--surface-strong);
   box-shadow: 0 18px 45px var(--shadow);
-  animation: card-in .9s cubic-bezier(.22, .72, .24, 1) both;
+  animation: card-in 1.2s cubic-bezier(.22, .72, .24, 1) both;
 }
 
 .card-meta {
@@ -221,6 +235,7 @@ h1 {
   line-height: 1.75;
   font-weight: 520;
   text-wrap: balance;
+  animation: text-breathe 10s ease-in-out infinite;
 }
 
 .companion-lines {
@@ -236,7 +251,7 @@ h1 {
   font-family: inherit;
   font-size: 16px;
   line-height: 1.65;
-  animation: companion-in .8s ease both;
+  animation: companion-in 1.2s ease both;
 }
 
 .companion-line:nth-child(2) { font-size: 15px; opacity: .86; }
@@ -338,6 +353,9 @@ h1 {
 .about-section h2 { margin: 0 0 10px; font-size: 17px; }
 .about-section p { margin: 0; color: var(--muted); line-height: 1.85; }
 .about-section p + p { margin-top: 12px; }
+.not-list { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 0 18px; color: var(--text); font-size: 15px; }
+.not-list span::before { content: '·'; margin-right: 7px; color: var(--muted); }
+.manifesto-section > p:last-child { color: var(--text); }
 .about-section a { color: var(--text); text-underline-offset: 4px; }
 .support-section { border-left: 3px solid var(--amber); padding-left: 20px; }
 .data-section { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }
@@ -348,10 +366,23 @@ h1 {
 .quiet-button:hover { color: var(--text); }
 .version { margin: 30px 0 0; color: var(--muted); text-align: center; font-size: 12px; }
 
+.welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--muted);
+  animation: welcome-out 1.6s ease both;
+}
+
+.welcome-screen span { font-size: 15px; letter-spacing: .08em; }
+
 .view-enter { animation: view-in .45s ease both; }
 
 @keyframes card-in {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(-14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -361,8 +392,18 @@ h1 {
 }
 
 @keyframes companion-in {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(12px); filter: blur(2px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes text-breathe {
+  0%, 100% { opacity: .94; }
+  50% { opacity: 1; }
+}
+
+@keyframes welcome-out {
+  0%, 72% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes farewell-in {
