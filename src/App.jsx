@@ -178,6 +178,7 @@ function App() {
   const [theme, setTheme] = useState(loadTheme)
   const [confirmClear, setConfirmClear] = useState(false)
   const [farewell, setFarewell] = useState('')
+  const [cardOrigin, setCardOrigin] = useState('home')
   const bags = useRef({})
   const lastPicked = useRef({})
   const farewellTimer = useRef(null)
@@ -200,13 +201,18 @@ function App() {
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
-  }, [view])
+  }, [view, cardOrigin])
 
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && view !== 'home') {
         setConfirmClear(false)
         if (view === 'card') {
+          if (cardOrigin === 'favorites') {
+            window.history.replaceState({ view: 'favorites' }, '', window.location.pathname)
+            setViewState('favorites')
+            return
+          }
           showFarewell()
           window.history.replaceState({ view: 'home' }, '', window.location.pathname)
           setViewState('home')
@@ -250,6 +256,7 @@ function App() {
   }
 
   function openEmotion(emotion) {
+    setCardOrigin('home')
     setActiveEmotion(emotion)
     setCompanionCount(0)
     pickCard(emotion)
@@ -273,6 +280,7 @@ function App() {
     if (!emotion) return
     const cardIndex = emotion.cards.findIndex((_, index) => `${emotion.id}-${index}` === item.id)
     const savedCard = cardIndex >= 0 ? emotion.cards[cardIndex] : null
+    setCardOrigin('favorites')
     setActiveEmotion(emotion)
     setCard({ id: item.id, text: item.text, companions: savedCard?.companions || [] })
     setCompanionCount(0)
@@ -290,6 +298,11 @@ function App() {
   }
 
   function leaveCard() {
+    if (cardOrigin === 'favorites') {
+      window.history.replaceState({ view: 'favorites' }, '', window.location.pathname)
+      setViewState('favorites')
+      return
+    }
     showFarewell()
     setView('home')
   }
